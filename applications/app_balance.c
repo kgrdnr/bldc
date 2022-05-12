@@ -723,14 +723,67 @@ static THD_FUNCTION(balance_thread, arg) {
 					derivative = biquad_process(&d_biquad_highpass, derivative);
 				}
 
-				float pid_integral = (balance_conf.ki * integral);
+				//ERPM based transition from vescman
+					// vescman at low speeds
+					float vescman_end_erpm = balance_conf.roll_steer_erpm_kp;
+					float vescman_amount = 1.0f;
+					float vescman_imu_amount = 1.0f;
+					float standard_tune_amount = 0.0f;
+					float dynamic_acc_conf = 0.01f;
+					float standard_acc_conf = imu_conf.accel_confidence_decay;
+					float vescman_acc_conf = balance_conf.yaw_current_clamp;
+					float dynamic_imu_kp = 0.0f;
+					float vescman_imu_kp = balance_conf.roll_steer_kp;
+					float standard_imu_kp = imu_conf.mahony_kp;
+					float dynamic_kp = 0.0f;
+					float vescman_kp = balance_conf.yaw_kp;
+					float dynamic_ki = 0.0f;
+					float vescman_ki = balance_conf.yaw_ki;
+					float dynamic_kd = 0.0f;
+					float vescman_kd = balance_conf.yaw_kd;
+					float kp_target = balance_conf.kp;
+					float ki_target = balance_conf.ki;
+					float kd_target = balance_conf.kd;
+
+
+
+								//if (mcpwm_foc_get_smooth_erpm() < (vescman_end_erpm + 1000)){ 
+									//interpolate from vescman to standard
+									vescman_amount = (float)((vescman_end_erpm - abs_erpm) / (float)vescman_end_erpm);
+									standard_tune_amount = 1.0f - vescman_amount;
+									if(standard_tune_amount > 1.0f) {
+										vescman_amount = 0.0f;
+										standard_tune_amount = 1.0f;
+									}
+									vescman_imu_amount = vescman_amount * vescman_amount;
+
+									//set imu filters
+									//dynamic_acc_conf = vescman_imu_amount * vescman_acc_conf + (1.0f - vescman_imu_amount) * standard_acc_conf;
+									//dynamic_imu_kp = vescman_imu_amount * vescman_imu_kp + (1.0f - vescman_imu_amount) * standard_imu_kp;
+									//ahrs_update_all_parameters(dynamic_acc_conf, dynamic_imu_kp, 0.0f, 0.0f);
+
+									dynamic_acc_conf = vescman_amount * vescman_acc_conf + standard_tune_amount * standard_acc_conf;
+									dynamic_imu_kp = vescman_amount * vescman_imu_kp + standard_tune_amount * standard_imu_kp;
+									ahrs_update_all_parameters(dynamic_acc_conf, dynamic_imu_kp, 0.0f, 0.0f);
+
+									//set PID gians
+									kp_target = vescman_amount * vescman_kp + standard_tune_amount * kp_target;
+									ki_target = vescman_amount * vescman_ki + standard_tune_amount * ki_target;
+									kd_target = vescman_amount * vescman_kd + standard_tune_amount * kd_target;
+
+
+
+								
+								//}
+
+				float pid_integral = (ki_target * integral);
 				// Integral limiting using biquad highpass:
 				if(balance_conf.deadzone > 0){
-					pid_integral = fminf(balance_conf.deadzone * 10, fabsf(pid_integral));
+					pid_integral = fminf(balance_conf.deadzone, fabsf(pid_integral));
 					pid_integral *= SIGN(integral);
 				}
 
-				pid_value = (balance_conf.kp * proportional) + pid_integral + (balance_conf.kd * derivative);
+				pid_value = (kp_target * proportional) + pid_integral + (kd_target * derivative);
 
 				last_proportional = proportional;
 

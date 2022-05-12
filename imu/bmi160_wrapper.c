@@ -64,6 +64,28 @@ static bool reset_init_bmi(BMI_STATE *s) {
 	s->sensor.gyro_cfg.bw = BMI160_GYRO_BW_OSR2_MODE;
 	s->sensor.gyro_cfg.power = BMI160_GYRO_NORMAL_MODE;
 
+	/*if(s->bandwidth >= 100){
+		int bandwidth = s->bandwidth - 100;
+		int accel_bw = bandwidth & 0x7;
+		int gyro_bw = (bandwidth >> 4) & 0x3;
+		s->sensor.accel_cfg.bw = accel_bw;
+		s->sensor.gyro_cfg.bw = gyro_bw;
+		}
+	if (s->range >= 100){
+		int range = s->range - 100;
+		int accel_range = range & 0x3;
+		int gyro_range = (range >> 2) & 0x7;
+		s->sensor.gyro_cfg.range = gyro_range;
+		if (accel_range == 0)
+			s->sensor.accel_cfg.range = BMI160_ACCEL_RANGE_2G;
+		if (accel_range == 1)
+			s->sensor.accel_cfg.range = BMI160_ACCEL_RANGE_4G;
+		if (accel_range == 2)
+			s->sensor.accel_cfg.range = BMI160_ACCEL_RANGE_8G;
+		if (accel_range == 3)
+			s->sensor.accel_cfg.range = BMI160_ACCEL_RANGE_16G;
+			}*/
+
 	if(s->rate_hz <= 25){
 		s->sensor.accel_cfg.odr = BMI160_ACCEL_ODR_25HZ;
 		s->sensor.gyro_cfg.odr = BMI160_GYRO_ODR_25HZ;

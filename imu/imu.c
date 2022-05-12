@@ -64,6 +64,8 @@ void imu_init(imu_config *set) {
 	m_icm20948_state.rate_hz = set->sample_rate_hz;
 	m_bmi_state.rate_hz = set->sample_rate_hz;
 	lsm6ds3_set_rate_hz(set->sample_rate_hz);
+	m_bmi_state.bandwidth = 0;
+	m_bmi_state.range = (int)set->madgwick_beta;
 
 	if (set->type == IMU_TYPE_INTERNAL) {
 #ifdef MPU9X50_SDA_GPIO
@@ -389,7 +391,7 @@ void imu_get_calibration(float yaw, float *imu_cal) {
 					m_settings.accel_confidence_decay,
 					m_settings.mahony_kp,
 					m_settings.mahony_ki,
-					m_settings.madgwick_beta);
+					0);//m_settings.madgwick_beta);
 	m_settings.rot_roll = backup_roll;
 	m_settings.rot_pitch = backup_pitch;
 	m_settings.rot_yaw = backup_yaw;
@@ -417,7 +419,7 @@ static void imu_read_callback(float *accel, float *gyro, float *mag) {
 				m_settings.accel_confidence_decay,
 				m_settings.mahony_kp,
 				m_settings.mahony_ki,
-				m_settings.madgwick_beta);
+				0);//m_settings.madgwick_beta);
 
 		FusionAhrsSetGain(&m_fusionAhrs, m_settings.madgwick_beta);
 		FusionAhrsSetAccConfDecay(&m_fusionAhrs, m_settings.accel_confidence_decay);

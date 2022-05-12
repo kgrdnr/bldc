@@ -24,7 +24,7 @@
 #define FW_VERSION_MAJOR			5
 #define FW_VERSION_MINOR			03
 // Set to 0 for building a release and iterate during beta test builds
-#define FW_TEST_VERSION_NUMBER		0
+#define FW_TEST_VERSION_NUMBER		1
 
 #include "datatypes.h"
 
@@ -48,6 +48,8 @@
  * as an argument.
  */
 #if !defined(HW_SOURCE) && !defined(HW_HEADER)
+#define HW_SOURCE "you forgot HW"
+#define HW_HEADER "you forgot HW"
 //#define HW_SOURCE "hw_40.c"
 //#define HW_HEADER "hw_40.h"
 
@@ -74,8 +76,8 @@
 //#define HW60_IS_MK4
 #define HW60_IS_MK5
 
-#define HW_SOURCE "hw_60.c"
-#define HW_HEADER "hw_60.h"
+//#define HW_SOURCE "hw_60.c"
+//#define HW_HEADER "hw_60.h"
 
 //#define HW_SOURCE "hw_r2.c"
 //#define HW_HEADER "hw_r2.h"
@@ -169,9 +171,9 @@
 //#define HW_SOURCE "hw_es19.c"
 //#define HW_HEADER "hw_es19.h"
 
-//#define LFOC_IS_V3
-//#define HW_SOURCE "hw_Little_FOCer.c"
-//#define HW_HEADER "hw_Little_FOCer.h"
+#define LFOC_IS_V3
+#define HW_SOURCE "hw_Little_FOCer.c"
+#define HW_HEADER "hw_Little_FOCer.h"
 
 //#define HW_SOURCE "hw_100_500.c"
 //#define HW_HEADER "hw_100_500.h"
