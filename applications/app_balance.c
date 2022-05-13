@@ -559,7 +559,7 @@ static void brake(void){
 	timeout_reset();
 	// Set current
 	mc_interface_set_brake_current(balance_conf.brake_current);
-	if(balance_conf.multi_esc){
+/*	if(balance_conf.multi_esc){
 		for (int i = 0;i < CAN_STATUS_MSGS_TO_STORE;i++) {
 			can_status_msg *msg = comm_can_get_status_msg_index(i);
 			if (msg->id >= 0 && UTILS_AGE_S(msg->rx_time) < MAX_CAN_AGE) {
@@ -567,13 +567,14 @@ static void brake(void){
 			}
 		}
 	}
+	*/
 }
 
 static void set_current(float current, float yaw_current){
 	// Reset the timeout
 	timeout_reset();
 	// Set current
-	if(balance_conf.multi_esc){
+/*	if(balance_conf.multi_esc){
 		// Set the current delay
 		mc_interface_set_current_off_delay(motor_timeout);
 		// Set Current
@@ -587,11 +588,11 @@ static void set_current(float current, float yaw_current){
 			}
 		}
 	} else {
-		// Set the current delay
+*/		// Set the current delay
 		mc_interface_set_current_off_delay(motor_timeout);
 		// Set Current
 		mc_interface_set_current(current);
-	}
+//	}
 }
 
 static THD_FUNCTION(balance_thread, arg) {
@@ -627,7 +628,7 @@ static THD_FUNCTION(balance_thread, arg) {
 		abs_duty_cycle = fabsf(duty_cycle);
 		erpm = mc_interface_get_rpm();
 		abs_erpm = fabsf(erpm);
-		if(balance_conf.multi_esc){
+/*		if(balance_conf.multi_esc){
 			avg_erpm = erpm;
 			for (int i = 0;i < CAN_STATUS_MSGS_TO_STORE;i++) {
 				can_status_msg *msg = comm_can_get_status_msg_index(i);
@@ -637,7 +638,7 @@ static THD_FUNCTION(balance_thread, arg) {
 			}
 			avg_erpm = avg_erpm/2;// Assume 2 motors, i don't know how to steer 3 anyways
 		}
-		adc1 = (((float)ADC_Value[ADC_IND_EXT])/4095) * V_REG;
+*/		adc1 = (((float)ADC_Value[ADC_IND_EXT])/4095) * V_REG;
 #ifdef ADC_IND_EXT2
 		adc2 = (((float)ADC_Value[ADC_IND_EXT2])/4095) * V_REG;
 #else
@@ -798,7 +799,7 @@ static THD_FUNCTION(balance_thread, arg) {
 				}
 
 
-				if(balance_conf.multi_esc){
+/*				if(balance_conf.multi_esc){
 					// Calculate setpoint
 					if(abs_duty_cycle < .02){
 						yaw_setpoint = 0;
@@ -822,7 +823,7 @@ static THD_FUNCTION(balance_thread, arg) {
 
 					yaw_last_proportional = yaw_proportional;
 				}
-
+*/
 				// Output to motor
 				set_current(pid_value, yaw_pid_value);
 				break;
